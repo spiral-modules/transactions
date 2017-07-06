@@ -9,14 +9,14 @@ interface PaymentSourceInterface
      *
      * @return string|null
      */
-    public function getGatewayID();
+    public function getGatewaySourceID();
 
     /**
-     * Card type (Maestro, Visa, AMEX, etc).
+     * Gateway internal customer ID (if exists) - customer should be stored in the payment gateway system.
      *
-     * @return string
+     * @return string|null
      */
-    public function getCardType(): string;
+    public function getGatewayCustomerID();
 
     /**
      * Card holder name (John Doe).
@@ -24,6 +24,13 @@ interface PaymentSourceInterface
      * @return string
      */
     public function getCardHolder(): string;
+
+    /**
+     * Card number.
+     *
+     * @return string
+     */
+    public function getCardNumber(): string;
 
     /**
      * Card expiration year (2017).
@@ -40,9 +47,23 @@ interface PaymentSourceInterface
     public function getExpMonth(): int;
 
     /**
-     * Card number last digits (1234).
+     * Card security code (CVC).
      *
      * @return int
      */
-    public function getNumberEnding(): int;
+    public function getSecurityCode(): int;
+
+    /**
+     * Card type (Maestro, Visa, AMEX, etc).
+     *
+     * @return string
+     */
+    //public function getCardType(): string;
+
+    /**
+     * Card number last digits (1234).
+     *
+     * @return string
+     */
+    //public function getNumberEnding(): string;
 }
