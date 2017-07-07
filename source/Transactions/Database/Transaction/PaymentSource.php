@@ -1,6 +1,6 @@
 <?php
 
-namespace Spiral\Transactions\Database;
+namespace Spiral\Transactions\Database\Transaction;
 
 use Spiral\ORM\Record;
 use Spiral\Transactions\PaymentSourceInterface;
@@ -10,12 +10,17 @@ class PaymentSource extends Record
     const SCHEMA = [
         'id'                  => 'primary',
         'gateway_source_id'   => 'string, nullable',
-        'gateway_customer_id' => 'string, nullable',
+        'currency'            => 'string(8)',
         'card_type'           => 'string',
         'card_holder'         => 'string',
         'exp_year'            => 'int',
         'exp_month'           => 'int',
         'number_ending'       => 'string',
+    ];
+
+    const INDEXES = [
+        [self::INDEX, 'currency'],
+        [self::UNIQUE, 'gateway_source_id'],
     ];
 
     /**
@@ -31,7 +36,7 @@ class PaymentSource extends Record
      */
     public function getGatewayCustomerID()
     {
-        return $this->gateway_customer_id;
+        return '';
     }
 
     /**

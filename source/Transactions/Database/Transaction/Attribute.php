@@ -1,10 +1,10 @@
 <?php
 
-namespace Spiral\Transactions\Database;
+namespace Spiral\Transactions\Database\Transaction;
 
 use Spiral\ORM\Record;
 
-class TransactionAttribute extends Record
+class Attribute extends Record
 {
     const DATABASE = 'transactions';
 

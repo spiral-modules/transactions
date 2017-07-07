@@ -5,7 +5,7 @@ namespace Spiral\Transactions;
 use Spiral\Transactions\Database\Sources\TransactionItemSource;
 use Spiral\Transactions\Database\Sources\TransactionSource;
 use Spiral\Transactions\Database\Transaction;
-use Spiral\Transactions\Database\TransactionItem;
+use Spiral\Transactions\Database\Item;
 use Spiral\Transactions\Exceptions\EmptyAmountArgumentException;
 use Spiral\Transactions\Exceptions\EmptySourceIDGatewayException;
 use Spiral\Transactions\Exceptions\InvalidAmountArgumentException;
@@ -36,11 +36,11 @@ class TransactionsProcessor
      * @param float  $amount   Purchased item amount, should be positive.
      * @param int    $quantity Purchased item quantity, should be positive.
      *
-     * @return TransactionItem
+     * @return Item
      * @throws InvalidAmountArgumentException
      * @throws InvalidQuantityArgumentException
      */
-    public function addItem(string $title, float $amount, int $quantity): TransactionItem
+    public function addItem(string $title, float $amount, int $quantity): Item
     {
         if ($amount <= 0) {
             throw new InvalidAmountArgumentException($amount);
@@ -50,39 +50,39 @@ class TransactionsProcessor
             throw new InvalidQuantityArgumentException($quantity);
         }
 
-        return $this->add($title, $amount, $quantity, TransactionItem::DEFAULT_TYPE);
+        return $this->add($title, $amount, $quantity, Item::DEFAULT_TYPE);
     }
 
     /**
      * @param string $title  Regulation item title, max 255 chars.
      * @param float  $amount Regulation item amount, any sigh, not null (zero).
      *
-     * @return TransactionItem
+     * @return Item
      * @throws EmptyAmountArgumentException
      */
-    public function addRegulation(string $title, float $amount): TransactionItem
+    public function addRegulation(string $title, float $amount): Item
     {
         if (empty($amount)) {
             throw new EmptyAmountArgumentException();
         }
 
-        return $this->add($title, $amount, 1, TransactionItem::REGULATION_TYPE);
+        return $this->add($title, $amount, 1, Item::REGULATION_TYPE);
     }
 
     /**
      * @param string $title  Discount item title, max 255 chars.
      * @param float  $amount Discount item amount, any sign, not null (zero).
      *
-     * @return TransactionItem
+     * @return Item
      * @throws EmptyAmountArgumentException
      */
-    public function addDiscount(string $title, float $amount): TransactionItem
+    public function addDiscount(string $title, float $amount): Item
     {
         if (empty($amount)) {
             throw new EmptyAmountArgumentException();
         }
 
-        return $this->add($title, -abs($amount), 1, TransactionItem::DISCOUNT_TYPE);
+        return $this->add($title, -abs($amount), 1, Item::DISCOUNT_TYPE);
     }
 
     /**
@@ -91,11 +91,11 @@ class TransactionsProcessor
      * @param int    $quantity
      * @param string $type
      *
-     * @return TransactionItem
+     * @return Item
      */
-    protected function add(string $title, float $amount, int $quantity, string $type): TransactionItem
+    protected function add(string $title, float $amount, int $quantity, string $type): Item
     {
-        /** @var TransactionItem $item */
+        /** @var Item $item */
         $item = $this->items->create();
         $item->title = $title;
         $item->amount = $amount;

@@ -3,51 +3,53 @@
 namespace Spiral\Transactions\Database;
 
 use Spiral\Models\Traits\TimestampsTrait;
-use Spiral\ORM\Record;
+use Spiral\Transactions\Database\Entities\AbstractTransactionEntity;
 use Spiral\Transactions\Database\Types\TransactionStatus;
 use Spiral\Transactions\PaymentSourceInterface;
 
-class Transaction extends Record
+class Transaction extends AbstractTransactionEntity
 {
     use TimestampsTrait;
 
     const DATABASE = 'transactions';
 
     const SCHEMA = [
-        'id'     => 'primary',
         'status' => TransactionStatus::class,
 
         'gateway'                => 'string',
-        'gateway_transaction_id' => 'string',
+        'gateway_transaction_id' => 'string(255)',
 
-        'paymentSource' => [self::BELONGS_TO => PaymentSourceInterface::class],
+        'paymentSource' => [
+            self::BELONGS_TO => PaymentSourceInterface::class
+        ],
         'revisions'     => [
-            self::HAS_MANY                => TransactionRevision::class,
-            TransactionRevision::INVERSE  => 'transaction',
-            TransactionRevision::ORDER_BY => [
-                '{@}.id' => 'ASC'
-            ]
+            self::HAS_MANY                 => Transaction\Revision::class,
+            Transaction\Revision::ORDER_BY => ['{@}.id' => 'ASC']
         ],
 
-        'currency'        => 'string(16)',
-        'total_amount'    => 'float',           //first paid amount (FYI)
-        'refunded_amount' => 'float, nullable', //total refunded amount (FYI)
-        'paid_amount'     => 'float',           //current paid amount (through all revisions)
-        'fee_amount'      => 'float',           //current gateway fee (through all revisions)
+        //first paid amount
+        'total_amount'  => 'float',
+        'currency'      => 'string(8)',
+
+        'refunds' => [
+            self::HAS_MANY               => Transaction\Refund::class,
+            Transaction\Refund::ORDER_BY => ['{@}.id' => 'ASC']
+        ],
 
         'attributes' => [
-            self::HAS_MANY => TransactionAttribute::class
+            self::HAS_MANY => Transaction\Attribute::class
         ],
         'items'      => [
-            self::HAS_MANY => TransactionItem::class
+            self::HAS_MANY => Transaction\Item::class
         ]
     ];
 
     const DEFAULTS = [
-        'currency' => 'USD'
+        'currency' => 'usd'
     ];
 
     const INDEXES = [
-        [self::INDEX, 'currency']
+        [self::INDEX, 'currency'],
+        [self::UNIQUE, 'gateway_transaction_id'],
     ];
 }

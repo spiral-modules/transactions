@@ -1,11 +1,11 @@
 <?php
 
-namespace Spiral\Transactions\Database;
+namespace Spiral\Transactions\Database\Transaction;
 
 use Spiral\Models\Traits\TimestampsTrait;
 use Spiral\ORM\Record;
 
-class TransactionItem extends Record
+class Item extends Record
 {
     use TimestampsTrait;
 

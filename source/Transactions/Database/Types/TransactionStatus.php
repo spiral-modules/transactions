@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Valentin
- * Date: 06.07.2017
- * Time: 15:11
- */
 
 namespace Spiral\Transactions\Database\Types;
-
 
 use Spiral\ORM\Columns\EnumColumn;
 
