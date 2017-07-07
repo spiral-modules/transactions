@@ -4,19 +4,23 @@ namespace Spiral\Transactions;
 
 use Spiral\Transactions\Database\Sources;
 use Spiral\Transactions\Database\Transaction;
-use Spiral\Transactions\Exceptions\EmptySourceIDGatewayException;
 use Spiral\Transactions\Exceptions\GatewayException;
 use Spiral\Transactions\Exceptions\Transaction\EmptyAmountException;
 use Spiral\Transactions\Exceptions\Transaction\InvalidAmountException;
 use Spiral\Transactions\Exceptions\Transaction\InvalidQuantityException;
+use Spiral\Transactions\Exceptions\TransactionException;
+use Spiral\Transactions\PaymentSources\CreditCardSource;
+use Spiral\Transactions\PaymentSources\TokenSource;
 
 class TransactionsProcessor
 {
     /** @var Sources\ItemSource */
     protected $items;
 
-    /** @var Sources\RevisionSource */
-    protected $revisions;
+    /** @var Sources\AttributeSource */
+    protected $attributes;
+
+    protected $sources;
 
     /** @var Transaction */
     protected $transaction;
@@ -29,19 +33,23 @@ class TransactionsProcessor
      *
      * @param Sources\TransactionSource $source
      * @param Sources\ItemSource        $itemSource
-     * @param Sources\RevisionSource    $revisionSource
+     * @param Sources\AttributeSource   $attributeSource
+     * @param Sources\SourceSource      $sourceSource
      * @param GatewayInterface          $gateway
      */
     public function __construct(
         Sources\TransactionSource $source,
         Sources\ItemSource $itemSource,
-        Sources\RevisionSource $revisionSource,
+        Sources\AttributeSource $attributeSource,
+        Sources\SourceSource $sourceSource,
         GatewayInterface $gateway
     ) {
-        $this->items = $itemSource;
-        $this->revisions = $revisionSource;
-        $this->gateway = $gateway;
         $this->transaction = $source->create();
+
+        $this->items = $itemSource;
+        $this->attributes = $attributeSource;
+        $this->sources = $sourceSource;
+        $this->gateway = $gateway;
     }
 
     /**
@@ -105,6 +113,7 @@ class TransactionsProcessor
      * @param string $type
      *
      * @return Transaction\Item
+     * @throws TransactionException
      */
     protected function add(string $title, float $amount, int $quantity, string $type): Transaction\Item
     {
@@ -115,58 +124,112 @@ class TransactionsProcessor
         $item->quantity = $quantity;
         $item->type = $type;
 
-        $this->transaction->items->push($item);
-        $this->transaction->incTotalAmount($amount);
+        $this->transaction->items->add($item);
+        $this->transaction->incPaidAmount($amount * $quantity);
 
         return $item;
     }
 
     /**
-     * @param PaymentSourceInterface $paymentSource
-     * @param array                  $metadata
+     * @param string      $currency
+     * @param TokenSource $source
+     * @param array       $params
+     * @param array       $attributes
      *
      * @return Transaction
-     * @throws EmptySourceIDGatewayException
+     * @throws GatewayException
+     * @throws TransactionException
      */
-    public function makeTransaction(PaymentSourceInterface $paymentSource, array $metadata = []): Transaction
+    public function payWithToken(
+        TokenSource $source,
+        string $currency = 'usd',
+        array $params = [],
+        array $attributes = []
+    ): Transaction {
+        $transaction = $this->gateway->payWithToken($this->transaction->getPaidAmount(), $currency, $source, $params);
+
+        return $this->pay($transaction, $attributes);
+    }
+
+    /**
+     * @param string           $currency
+     * @param CreditCardSource $source
+     * @param array            $params
+     * @param array            $attributes
+     *
+     * @return Transaction
+     * @throws TransactionException
+     */
+    public function payWithCreditCard(
+        CreditCardSource $source,
+        string $currency = 'usd',
+        array $params = [],
+        array $attributes = []
+    ): Transaction {
+        $transaction = $this->gateway->payWithCreditCard($this->transaction->getPaidAmount(), $currency, $source, $params);
+
+        return $this->pay($transaction, $attributes);
+    }
+
+    /**
+     * @param GatewayTransactionInterface $transaction
+     * @param array                       $attributes
+     *
+     * @return Transaction
+     */
+    protected function pay(GatewayTransactionInterface $transaction, array $attributes)
     {
-        try {
-            $transaction = $this->gateway->createTransaction($this->transaction, $paymentSource, $metadata);
-            $this->transaction->revisions->add($this->makePurchaseRevision($transaction));
-            $this->transaction->save();
-
-            return $this->transaction;
-        } catch (GatewayException $exception) {
-            $this->transaction->setFailedStatus();
-            //todo add attribute with error message
-            $this->transaction->save();
-
-            $this->packException();
+        foreach ($attributes as $name => $value) {
+            $this->transaction->attributes->add(
+                $this->attributes->create(compact('name', 'value'))
+            );
         }
 
-        //do some custom operations with transaction
-        //cal gateway provider
+        /** @var Transaction\Source $source */
+        $source = $this->sources->create();
+        $source->
+
+        $this->fillPurchaseTransaction($transaction);
+        $this->transaction->save();
 
         return $this->transaction;
     }
 
     /**
-     * @param GatewayTransactionInterface $transaction
+     * @param array $metadata
+     * @param array $attributes
      *
-     * @return Transaction\Revision
+     * @return Transaction
+     * @throws GatewayException
      */
-    protected function makePurchaseRevision(GatewayTransactionInterface $transaction): Transaction\Revision
-    {
-        /** @var Transaction\Revision $revision */
-        $revision = $this->revisions->create();
-        $revision->setPurchase();
-        $revision->setGatewayRawData($transaction->getRawData());
-        $revision->setPaidAmount($transaction->getPaidAmount());
-        $revision->setFeeAmount($transaction->getFeeAmount());
-        $revision->setRefundedAmount($transaction->getRefundedAmount());
-
-        return $revision;
-    }
+//    public function makeTransaction(PaymentSourceInterface $paymentSource, array $metadata = [], array $attributes = []): Transaction
+//    {
+//        try {
+//            $transaction = $this->gateway->createTransaction($this->transaction, $paymentSource, $metadata);
+//            foreach ($attributes as $name => $value) {
+//                $this->transaction->attributes->add(
+//                    $this->attributes->create(compact('name', 'value'))
+//                );
+//            }
+//
+//            $this->fillPurchaseTransaction($transaction);
+//            $this->transaction->save();
+//
+//            return $this->transaction;
+//        } catch (GatewayException $exception) {
+////            /** @var Transaction\Attribute $attribute */
+////            $attribute = $this->attributes->create([
+////                'name'  => Transaction\Attribute::GATEWAY_ERROR,
+////                'value' => $exception->getMessage()
+////            ]);
+////
+////            $this->transaction->attributes->add($attribute);
+////            $this->transaction->setFailedStatus();
+////            $this->transaction->save();
+//
+//            throw $exception;
+//        }
+//    }
 
     /**
      * @param GatewayTransactionInterface $transaction
@@ -174,15 +237,10 @@ class TransactionsProcessor
     protected function fillPurchaseTransaction(GatewayTransactionInterface $transaction)
     {
         $this->transaction->setCompletedStatus();
-        $this->transaction->setGatewayRawData($transaction->getRawData());
-        $this->transaction->setGatewayTransactionID($transaction->getTransactionID());
+        $this->transaction->setGateway($this->gateway->getName());
+        $this->transaction->setGatewayID($transaction->getTransactionID());
+        $this->transaction->setCurrency($transaction->getCurrency());
         $this->transaction->setPaidAmount($transaction->getPaidAmount());
         $this->transaction->setFeeAmount($transaction->getFeeAmount());
-        $this->transaction->setRefundedAmount($transaction->getRefundedAmount());
-    }
-
-    protected function packException()
-    {
-
     }
 }

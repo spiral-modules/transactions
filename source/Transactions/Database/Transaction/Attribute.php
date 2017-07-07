@@ -17,4 +17,9 @@ class Attribute extends Record
     const INDEXES = [
         [self::INDEX, 'name', 'value']
     ];
+
+    const FILLABLE = ['*'];
+
+    const IP_ADDRESS    = 'ipAddress';
+    const GATEWAY_ERROR = 'gatewayError';
 }

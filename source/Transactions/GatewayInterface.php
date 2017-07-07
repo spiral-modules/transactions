@@ -2,21 +2,37 @@
 
 namespace Spiral\Transactions;
 
-use Spiral\Transactions\Database\Transaction;
+use Spiral\Transactions\PaymentSources\CreditCardSource;
+use Spiral\Transactions\PaymentSources\TokenSource;
 
 interface GatewayInterface
 {
     /**
-     * @param Database\Transaction   $transaction
-     * @param PaymentSourceInterface $paymentSource
-     * @param array                  $metadata
+     * Gateway name.
+     *
+     * @return string
+     */
+    public function getName(): string;
+
+    /**
+     * @param float       $amount
+     * @param string      $currency
+     * @param TokenSource $source
+     * @param array       $params
      *
      * @return GatewayTransactionInterface
      * @throws Exceptions\GatewayException
      */
-    public function createTransaction(
-        Transaction $transaction,
-        PaymentSourceInterface $paymentSource,
-        array $metadata = []
-    ): GatewayTransactionInterface;
+    public function payWithToken(float $amount, string $currency, TokenSource $source, array $params = []): GatewayTransactionInterface;
+
+    /**
+     * @param float            $amount
+     * @param string           $currency
+     * @param CreditCardSource $source
+     * @param array            $params
+     *
+     * @return GatewayTransactionInterface
+     * @throws Exceptions\GatewayException
+     */
+    public function payWithCreditCard(float $amount, string $currency, CreditCardSource $source, array $params = []): GatewayTransactionInterface;
 }

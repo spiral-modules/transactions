@@ -2,19 +2,47 @@
 
 namespace Spiral\Transactions;
 
-use Spiral\Transactions\Database\Transaction\Revision;
-
 interface GatewayTransactionInterface
 {
-    public function getRevision(): Revision;
-
+    /**
+     * Internal gateway ID.
+     *
+     * @return string
+     */
     public function getTransactionID(): string;
 
+    /**
+     * Calculated fee amount.
+     *
+     * @return float
+     */
     public function getFeeAmount(): float;
 
+    /**
+     * Paid amount.
+     *
+     * @return float
+     */
     public function getPaidAmount(): float;
 
+    /**
+     * Refunded amount.
+     *
+     * @return float
+     */
     public function getRefundedAmount(): float;
 
-    public function getRawData(): array;
+    /**
+     * Transaction currency.
+     *
+     * @return string
+     */
+    public function getCurrency(): string;
+
+    /**
+     * Transaction source.
+     *
+     * @return array
+     */
+    public function getSource(): array;
 }

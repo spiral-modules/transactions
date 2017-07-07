@@ -14,7 +14,6 @@ class Refund extends Record
     const SCHEMA = [
         'id'                => 'primary',
         'gateway_refund_id' => 'string(255)',
-        'gateway_raw_data'  => 'text', //todo json?
         'currency'          => 'string(8)',
         'amount'            => 'float'
     ];

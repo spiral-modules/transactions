@@ -3,19 +3,18 @@
 namespace Spiral\Transactions\Database\Transaction;
 
 use Spiral\ORM\Record;
-use Spiral\Transactions\PaymentSourceInterface;
 
-class PaymentSource extends Record
+class Source extends Record
 {
     const SCHEMA = [
-        'id'                  => 'primary',
-        'gateway_source_id'   => 'string, nullable',
-        'currency'            => 'string(8)',
-        'card_type'           => 'string',
-        'card_holder'         => 'string',
-        'exp_year'            => 'int',
-        'exp_month'           => 'int',
-        'number_ending'       => 'string',
+        'id'            => 'primary',
+        'gateway_id'    => 'string, nullable',
+        'currency'      => 'string(8)',
+        'card_type'     => 'string',
+        'card_holder'   => 'string',
+        'exp_year'      => 'int',
+        'exp_month'     => 'int',
+        'number_ending' => 'string',
     ];
 
     const INDEXES = [
@@ -26,17 +25,9 @@ class PaymentSource extends Record
     /**
      * {@inheritdoc}
      */
-    public function getGatewaySourceID()
+    public function getGatewayID()
     {
-        return $this->gateway_source_id;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getGatewayCustomerID()
-    {
-        return '';
+        return $this->gateway_id;
     }
 
     /**

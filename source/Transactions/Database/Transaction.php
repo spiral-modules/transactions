@@ -3,20 +3,27 @@
 namespace Spiral\Transactions\Database;
 
 use Spiral\Models\Traits\TimestampsTrait;
-use Spiral\Transactions\Database\Entities\AbstractTransactionEntity;
+use Spiral\ORM\Record;
 use Spiral\Transactions\Database\Types\TransactionStatus;
-use Spiral\Transactions\PaymentSourceInterface;
 
 /**
  * Class Transaction
  *
  * @package Spiral\Transactions\Database
- * @property \Spiral\ORM\Entities\Relations\HasManyRelation $revisions
+ *
+ * @property string                                         $currency
+ * @property string                                         $gateway
+ * @property string                                         $gateway_id
+ * @property float                                          $billable_amount
+ * @property float                                          $paid_amount
+ * @property float                                          $refunded_amount
+ * @property float|null                                     $fee_amount
+ * @property TransactionStatus                              $status
  * @property \Spiral\ORM\Entities\Relations\HasManyRelation $refunds
  * @property \Spiral\ORM\Entities\Relations\HasManyRelation $attributes
  * @property \Spiral\ORM\Entities\Relations\HasManyRelation $items
  */
-class Transaction extends AbstractTransactionEntity
+class Transaction extends Record
 {
     use TimestampsTrait;
 
@@ -25,20 +32,18 @@ class Transaction extends AbstractTransactionEntity
     const SCHEMA = [
         'status' => TransactionStatus::class,
 
-        'gateway'                => 'string',
-        'gateway_transaction_id' => 'string(255)',
+        'gateway'    => 'string',
+        'gateway_id' => 'string(255)',
 
-        'paymentSource' => [
-            self::BELONGS_TO => PaymentSourceInterface::class
-        ],
-        'revisions'     => [
-            self::HAS_MANY                 => Transaction\Revision::class,
-            Transaction\Revision::ORDER_BY => ['{@}.id' => 'ASC']
-        ],
+//        'paymentSource' => [
+//            self::BELONGS_TO => PaymentSourceInterface::class
+//        ],
 
-        //first paid amount
-        'total_amount'  => 'float',
-        'currency'      => 'string(8)',
+        'id'              => 'primary',
+        'paid_amount'     => 'float',
+        'fee_amount'      => 'float',
+        'refunded_amount' => 'float, nullable',
+        'currency'        => 'string(8)',
 
         'refunds' => [
             self::HAS_MANY               => Transaction\Refund::class,
@@ -59,24 +64,8 @@ class Transaction extends AbstractTransactionEntity
 
     const INDEXES = [
         [self::INDEX, 'currency'],
-        [self::UNIQUE, 'gateway_transaction_id'],
+        [self::UNIQUE, 'gateway_id'],
     ];
-
-    /**
-     * @return float
-     */
-    public function getBillableAmount(): float
-    {
-        return $this->total_amount;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCurrency(): string
-    {
-        return $this->currency;
-    }
 
     /**
      * Apply "completed" value.
@@ -94,18 +83,107 @@ class Transaction extends AbstractTransactionEntity
         $this->status->setFailed();
     }
 
-    public function incTotalAmount(float $inc)
+    /**
+     * @return float
+     */
+    public function getPaidAmount(): float
     {
-        $this->total_amount += $inc;
+        return $this->paid_amount;
     }
 
-    public function setTotalAmount(float $amount)
+    /**
+     * @param float $amount
+     */
+    public function setPaidAmount(float $amount)
     {
-        $this->total_amount = $amount;
+        $this->paid_amount = $amount;
     }
 
-    public function setGatewayTransactionID(string $transactionID)
+    /**
+     * @return string
+     */
+    public function getCurrency(): string
     {
-        $this->gateway_transaction_id = $transactionID;
+        return $this->currency;
+    }
+
+    /**
+     * @param string $currency
+     */
+    public function setCurrency(string $currency)
+    {
+        $this->currency = $currency;
+    }
+
+    /**
+     * @return float
+     */
+    public function getFeeAmount(): float
+    {
+        return $this->fee_amount;
+    }
+
+    /**
+     * @param float $amount
+     */
+    public function setFeeAmount(float $amount)
+    {
+        $this->fee_amount = $amount;
+    }
+
+    /**
+     * @param float $inc
+     */
+    public function incPaidAmount(float $inc)
+    {
+        $this->billable_amount += $inc;
+    }
+
+    /**
+     * @return float
+     */
+    public function getRefundedAmount(): float
+    {
+        return $this->refunded_amount;
+    }
+
+    /**
+     * @param float $amount
+     */
+    public function setRefundedAmount(float $amount)
+    {
+        $this->refunded_amount = $amount;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGateway(): string
+    {
+        return $this->gateway;
+    }
+
+    /**
+     * @param string $gateway
+     */
+    public function setGateway(string $gateway)
+    {
+        $this->gateway = $gateway;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGatewayID(): string
+    {
+        return $this->gateway_id;
+    }
+
+    /**
+     * @param string $id
+     */
+    public function setGatewayID(string $id)
+    {
+        $this->gateway_id = $id;
     }
 }
