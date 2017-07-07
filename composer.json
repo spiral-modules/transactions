@@ -1,0 +1,7 @@
+{
+    "require": {
+        "spiral/framework": "^1.0",
+        "spiral/database": "^1.0",
+        "stripe/stripe-php": "^5.1"
+    }
+}

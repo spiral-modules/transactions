@@ -9,14 +9,14 @@ interface PaymentSourceInterface
      *
      * @return string|null
      */
-    public function getGatewaySourceID();
+    public function getSourceID();
 
     /**
      * Gateway internal customer ID (if exists) - customer should be stored in the payment gateway system.
      *
      * @return string|null
      */
-    public function getGatewayCustomerID();
+    public function getCustomerID();
 
     /**
      * Card holder name (John Doe).

@@ -3,9 +3,9 @@
 namespace Spiral\Transactions\Database\Sources;
 
 use Spiral\ORM\Entities\RecordSource;
-use Spiral\Transactions\Database\Item;
+use Spiral\Transactions\Database\Transaction\Item;
 
-class TransactionItemSource extends RecordSource
+class ItemSource extends RecordSource
 {
     const RECORD = Item::class;
 }

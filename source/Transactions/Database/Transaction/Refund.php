@@ -9,7 +9,7 @@ class Refund extends Record
 {
     use TimestampsTrait;
 
-    const DATABASE = 'refunds';
+    const DATABASE = 'transactions';
 
     const SCHEMA = [
         'id'                => 'primary',

@@ -3,14 +3,14 @@
 namespace Spiral\Transactions\Database\Transaction;
 
 use Spiral\Models\Traits\TimestampsTrait;
-use Spiral\ORM\Record;
+use Spiral\Transactions\Database\Entities\AbstractTransactionEntity;
 use Spiral\Transactions\Database\Types\RevisionOperation;
 
-class Revision extends Record
+class Revision extends AbstractTransactionEntity
 {
     use TimestampsTrait;
 
-    const DATABASE = 'revisions';
+    const DATABASE = 'transactions';
 
     const SCHEMA = [
         'operation' => RevisionOperation::class,
@@ -24,4 +24,12 @@ class Revision extends Record
     const INDEXES = [
         [self::INDEX, 'operation']
     ];
+
+    /**
+     * Apply "purchase" value.
+     */
+    public function setPurchase()
+    {
+        $this->operation->setPurchase();
+    }
 }

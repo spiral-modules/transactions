@@ -7,6 +7,15 @@ use Spiral\Transactions\Database\Entities\AbstractTransactionEntity;
 use Spiral\Transactions\Database\Types\TransactionStatus;
 use Spiral\Transactions\PaymentSourceInterface;
 
+/**
+ * Class Transaction
+ *
+ * @package Spiral\Transactions\Database
+ * @property \Spiral\ORM\Entities\Relations\HasManyRelation $revisions
+ * @property \Spiral\ORM\Entities\Relations\HasManyRelation $refunds
+ * @property \Spiral\ORM\Entities\Relations\HasManyRelation $attributes
+ * @property \Spiral\ORM\Entities\Relations\HasManyRelation $items
+ */
 class Transaction extends AbstractTransactionEntity
 {
     use TimestampsTrait;
@@ -52,4 +61,51 @@ class Transaction extends AbstractTransactionEntity
         [self::INDEX, 'currency'],
         [self::UNIQUE, 'gateway_transaction_id'],
     ];
+
+    /**
+     * @return float
+     */
+    public function getBillableAmount(): float
+    {
+        return $this->total_amount;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrency(): string
+    {
+        return $this->currency;
+    }
+
+    /**
+     * Apply "completed" value.
+     */
+    public function setCompletedStatus()
+    {
+        $this->status->setCompleted();
+    }
+
+    /**
+     * Apply "failed" value.
+     */
+    public function setFailedStatus()
+    {
+        $this->status->setFailed();
+    }
+
+    public function incTotalAmount(float $inc)
+    {
+        $this->total_amount += $inc;
+    }
+
+    public function setTotalAmount(float $amount)
+    {
+        $this->total_amount = $amount;
+    }
+
+    public function setGatewayTransactionID(string $transactionID)
+    {
+        $this->gateway_transaction_id = $transactionID;
+    }
 }

@@ -1,8 +1,10 @@
 <?php
 
-namespace Spiral\Transactions\Exceptions;
+namespace Spiral\Transactions\Exceptions\Transaction;
 
-class InvalidQuantityArgumentException extends TransactionException
+use Spiral\Transactions\Exceptions\TransactionException;
+
+class InvalidQuantityException extends TransactionException
 {
     public function __construct($quantity = "", $code = 0, \Throwable $previous = null)
     {

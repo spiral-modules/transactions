@@ -10,7 +10,7 @@ class Item extends Record
     use TimestampsTrait;
 
     const DEFAULT_TYPE    = 'item';
-    const REGULATION_TYPE = 'regulation';
+    const CORRECTION_TYPE = 'correction';
     const DISCOUNT_TYPE   = 'discount';
 
     const DATABASE = 'transactions';

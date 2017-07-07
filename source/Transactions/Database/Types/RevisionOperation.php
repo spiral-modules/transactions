@@ -11,4 +11,12 @@ class RevisionOperation extends EnumColumn
 
     const VALUES  = [self::PURCHASE, self::REFUND];
     const DEFAULT = self::PURCHASE;
+
+    /**
+     * Apply "purchase" value.
+     */
+    public function setPurchase()
+    {
+        $this->setValue(self::PURCHASE);
+    }
 }

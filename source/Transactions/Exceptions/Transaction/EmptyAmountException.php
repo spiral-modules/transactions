@@ -1,8 +1,10 @@
 <?php
 
-namespace Spiral\Transactions\Exceptions;
+namespace Spiral\Transactions\Exceptions\Transaction;
 
-class EmptyAmountArgumentException extends TransactionException
+use Spiral\Transactions\Exceptions\TransactionException;
+
+class EmptyAmountException extends TransactionException
 {
     public function __construct($message = "", $code = 0, \Throwable $previous = null)
     {
