@@ -3,7 +3,6 @@
 namespace Spiral\Transactions\Gateways\Stripe;
 
 use Spiral\Transactions\Configs\TransactionsConfig;
-use Spiral\Transactions\Gateways\Stripe\Entities;
 use Stripe\Charge;
 use Stripe\Refund;
 
@@ -26,37 +25,31 @@ class Refunds
 
     /**
      * @param Charge $charge
-     * @param bool   $asArray
      *
-     * @return array
+     * @return Refund[]
      */
-    public function getRefunds(Charge $charge, bool $asArray = false)
+    public function getRefunds(Charge $charge)
     {
         $refunds = [];
         if (!$charge->refunds->has_more) {
             foreach ($charge->refunds->data as $refund) {
-                $refunds[$refund->id] = $this->makeRefundObject($refund, $asArray);
+                $refunds[$refund->id] = $refund;
             }
         } else {
             $startingAfter = null;
             $calls = ceil($charge->refunds->total_count / self::LIMIT);
-            for ($i = 0; $i < $calls; $i++) {
-                $options = [
-                    'charge' => $charge->id
-                ];
-                if (!empty($startingAfter)) {
-                    $options['starting_after'] = $startingAfter;
-                }
 
+            for ($i = 0; $i < $calls; $i++) {
+                $options = $this->refundsQuery($charge, $startingAfter);
                 $callRefunds = Refund::all($options, $this->options());
 
                 foreach ($callRefunds->data as $id => $callRefund) {
-                    if ($id === 0) {
+                    if (!empty($startingAfter)) {
                         $startingAfter = $callRefund->id;
                     }
 
                     if (!isset($refunds[$callRefund->id])) {
-                        $refunds[$callRefund->id] = $this->makeRefundObject($callRefund, $asArray);
+                        $refunds[$callRefund->id] = $callRefund;
                     }
                 }
             }
@@ -66,18 +59,23 @@ class Refunds
     }
 
     /**
-     * @param Refund $refund
-     * @param bool   $asArray
+     * @param \Stripe\Charge $charge
+     * @param string|null    $startingAfter
      *
-     * @return Entities\Refund|Refund
+     * @return array
      */
-    protected function makeRefundObject(Refund $refund, bool $asArray)
+    protected function refundsQuery(Charge $charge, string $startingAfter = null): array
     {
-        if (empty($asArray)) {
-            return new Entities\Refund($refund);
+        $options = [
+            'limit'  => self::LIMIT,
+            'charge' => $charge->id
+        ];
+
+        if (!empty($startingAfter)) {
+            $options['starting_after'] = $startingAfter;
         }
 
-        return $refund;
+        return $options;
     }
 
     /**

@@ -13,7 +13,7 @@ use Stripe\Charge;
 use Stripe\Error;
 
 /**
- * @link https://stripe.com/docs/currencies
+ * @link    https://stripe.com/docs/currencies
  * Class StripeGateway
  *
  * @package Spiral\Transactions\Gateways\Stripe
@@ -121,8 +121,10 @@ class StripeGateway implements GatewayInterface
     {
         try {
             $charge = Charge::retrieve($id, $this->getOptions());
+            $refunds = $this->refunds->getRefunds($charge);
+            $fee = $this->fees->getFee($charge, $refunds);
 
-            return new Entities\Transaction($charge, $this->fees, $this->refunds);
+            return new Entities\Transaction($charge, $fee, $refunds);
         } catch (\Throwable $exception) {
             throw new GatewayException(self::UPD_EXCEPTION_MSG, $exception->getCode(), $exception);
         }
@@ -140,8 +142,9 @@ class StripeGateway implements GatewayInterface
     {
         try {
             $charge = Charge::create($params, $this->getOptions());
+            $fee = $this->fees->getFee($charge);
 
-            return new Entities\Transaction($charge, $this->fees, $this->refunds);
+            return new Entities\Transaction($charge, $fee);
         } catch (Error\Api $exception) {
             $msg = self::CONNECTION_EXCEPTION_MSG;
         } catch (Error\ApiConnection $exception) {

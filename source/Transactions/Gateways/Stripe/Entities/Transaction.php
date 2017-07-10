@@ -2,8 +2,6 @@
 
 namespace Spiral\Transactions\Gateways\Stripe\Entities;
 
-use Spiral\Transactions\Gateways\Stripe\Fees;
-use Spiral\Transactions\Gateways\Stripe\Refunds;
 use Spiral\Transactions\GatewaySourceInterface;
 use Spiral\Transactions\GatewayTransactionInterface;
 use Stripe\Charge;
@@ -13,23 +11,23 @@ class Transaction implements GatewayTransactionInterface
     /** @var Charge */
     protected $charge;
 
-    /** @var Fees|null */
-    protected $fees = null;
+    /** @var float */
+    protected $fee;
 
-    /** @var Refunds|null */
-    protected $refunds = null;
+    /** @var Refund[] */
+    protected $refunds = [];
 
     /**
      * Transaction constructor.
      *
-     * @param Charge       $charge
-     * @param Fees|null    $fees
-     * @param Refunds|null $refunds
+     * @param Charge   $charge
+     * @param float    $fee
+     * @param Refund[] $refunds
      */
-    public function __construct(Charge $charge, Fees $fees = null, Refunds $refunds = null)
+    public function __construct(Charge $charge, float $fee, array $refunds = [])
     {
         $this->charge = $charge;
-        $this->fees = $fees;
+        $this->fee = $fee;
         $this->refunds = $refunds;
     }
 
@@ -62,7 +60,7 @@ class Transaction implements GatewayTransactionInterface
      */
     public function getFeeAmount(): float
     {
-        return $this->fees->getFee($this->charge);
+        return $this->fee;
     }
 
     /**
@@ -70,7 +68,12 @@ class Transaction implements GatewayTransactionInterface
      */
     public function getRefunds(): array
     {
-        return $this->refunds->getRefunds($this->charge);
+        $refunds = [];
+        foreach ($this->refunds as $refund) {
+            $refunds[] = new Refund($refund);
+        }
+
+        return $refunds;
     }
 
     /**

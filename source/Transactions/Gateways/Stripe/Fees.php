@@ -27,16 +27,17 @@ class Fees
     }
 
     /**
-     * @param Charge $charge
+     * @param Charge           $charge
+     * @param \Stripe\Refund[] $refunds
      *
      * @return float
      */
-    public function getFee(Charge $charge): float
+    public function getFee(Charge $charge, array $refunds = []): float
     {
         $balance = BalanceTransaction::retrieve($charge->balance_transaction, $this->options());
         $fee = $balance->fee;
 
-        foreach ($this->refunds->getRefunds($charge, true) as $refund) {
+        foreach ($refunds as $refund) {
             $balance = BalanceTransaction::retrieve($refund->balance_transaction, $this->options());
             $fee += $balance->fee;
         }
