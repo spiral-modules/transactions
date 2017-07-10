@@ -1,0 +1,16 @@
+language: php
+
+php:
+  - '7.1'
+
+before_install:
+- composer require satooshi/php-coveralls:dev-master
+- composer install --dev
+
+install:
+  - composer install --no-interaction --prefer-source
+
+after_script:
+  - php vendor/bin/coveralls -v
+
+script: phpunit --coverage-clover clover.xml

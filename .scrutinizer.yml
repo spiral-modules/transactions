@@ -1,0 +1,15 @@
+checks:
+    php:
+        code_rating: true
+        duplication: true
+
+build:
+  environment:
+    php: "7.1"
+
+  tests:
+      before:
+          - "phpunit"
+
+before_commands:
+    - "composer install --no-interaction --prefer-source"
