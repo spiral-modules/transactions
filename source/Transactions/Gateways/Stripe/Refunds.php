@@ -2,7 +2,7 @@
 
 namespace Spiral\Transactions\Gateways\Stripe;
 
-use Spiral\Transactions\TransactionsConfig;
+use Spiral\Transactions\Configs\TransactionsConfig;
 use Spiral\Transactions\Gateways\Stripe\Entities;
 use Stripe\Charge;
 use Stripe\Refund;

@@ -8,10 +8,16 @@ use Spiral\Transactions\GatewayTransactionInterface;
 use Spiral\Transactions\GatewayInterface;
 use Spiral\Transactions\Sources\CreditCardSource;
 use Spiral\Transactions\Sources\TokenSource;
-use Spiral\Transactions\TransactionsConfig;
+use Spiral\Transactions\Configs\TransactionsConfig;
 use Stripe\Charge;
 use Stripe\Error;
 
+/**
+ * @link https://stripe.com/docs/currencies
+ * Class StripeGateway
+ *
+ * @package Spiral\Transactions\Gateways\Stripe
+ */
 class StripeGateway implements GatewayInterface
 {
     const CONNECTION_EXCEPTION_MSG        = 'Network communication with Stripe failed, please retry.';

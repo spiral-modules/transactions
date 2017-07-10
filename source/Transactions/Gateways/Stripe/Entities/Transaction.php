@@ -20,9 +20,13 @@ class Transaction implements GatewayTransactionInterface
     protected $refunds = null;
 
     /**
-     * @param Charge $charge
+     * Transaction constructor.
+     *
+     * @param Charge       $charge
+     * @param Fees|null    $fees
+     * @param Refunds|null $refunds
      */
-    public function __construct(Charge $charge, Fees $fees, Refunds $refunds)
+    public function __construct(Charge $charge, Fees $fees = null, Refunds $refunds = null)
     {
         $this->charge = $charge;
         $this->fees = $fees;

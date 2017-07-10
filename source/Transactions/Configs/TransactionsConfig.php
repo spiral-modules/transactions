@@ -1,6 +1,6 @@
 <?php
 
-namespace Spiral\Transactions;
+namespace Spiral\Transactions\Configs;
 
 use Spiral\Core\InjectableConfig;
 use Spiral\Transactions\Gateways\Stripe\StripeGateway;

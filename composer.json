@@ -1,4 +1,13 @@
 {
+  "name": "spiral/transactions",
+  "description": "Spiral Transactions Module",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Valentin V / vvval",
+      "email": "vintsukevich@gmail.com"
+    }
+  ],
   "require": {
     "spiral/framework": "^1.0",
     "spiral/database": "^1.0",
