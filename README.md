@@ -4,7 +4,6 @@ Stripe transactions integration and Vault controls
 
 ### Pay
 ```php
-$this->container->bind(GatewayInterface::class, StripeGateway::class);
 /** @var Processors\PaymentsProcessor $processor */
 $processor = $this->container->get(Processors\PaymentsProcessor::class);
 
