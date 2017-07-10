@@ -7,7 +7,12 @@ use Spiral\ORM\Record;
 /**
  * Class Source
  *
- * @property string $gateway_id
+ * @property string|null $gateway_id
+ * @property string      $card_type
+ * @property string      $card_holder
+ * @property int         $exp_month
+ * @property int         $exp_year
+ * @property string      $number_ending
  * @package Spiral\Transactions\Database\Transaction
  */
 class Source extends Record

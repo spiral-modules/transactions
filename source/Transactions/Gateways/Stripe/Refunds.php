@@ -9,9 +9,10 @@ use Stripe\Refund;
 
 class Refunds
 {
-    /** @var array */
+    /** @var TransactionsConfig */
     protected $config = [];
-    const LIMIT = 1;
+
+    const LIMIT = 100;
 
     /**
      * Refunds constructor.
