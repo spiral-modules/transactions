@@ -29,7 +29,7 @@ class Source extends Record
     /**
      * @return string
      */
-    public function getGatewayID()
+    public function getGatewayID(): string
     {
         return $this->gateway_id;
     }

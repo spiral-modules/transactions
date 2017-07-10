@@ -24,6 +24,22 @@ class TransactionStatus extends EnumColumn
     }
 
     /**
+     * Apply "refunded" value.
+     */
+    public function setRefunded()
+    {
+        $this->setValue(self::REFUNDED);
+    }
+
+    /**
+     * Apply "partially-refunded" value.
+     */
+    public function setPartiallyRefunded()
+    {
+        $this->setValue(self::PARTIALLY_REFUNDED);
+    }
+
+    /**
      * Apply "failed" value.
      */
     public function setFailed()

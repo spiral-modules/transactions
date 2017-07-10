@@ -33,6 +33,13 @@ interface GatewayTransactionInterface
     public function getRefundedAmount(): float;
 
     /**
+     * Refunds Amount
+     *
+     * @return GatewayRefundInterface[]
+     */
+    public function getRefunds(): array;
+
+    /**
      * Transaction currency.
      *
      * @return string
@@ -40,9 +47,23 @@ interface GatewayTransactionInterface
     public function getCurrency(): string;
 
     /**
+     * If transaction is partially refunded.
+     *
+     * @return bool
+     */
+    public function isPartiallyRefunded(): bool;
+
+    /**
+     * If transaction is fully refunded.
+     *
+     * @return bool
+     */
+    public function isRefunded(): bool;
+
+    /**
      * Transaction payment source.
      *
-     * @return GatewayPaymentSourceInterface
+     * @return GatewaySourceInterface
      */
-    public function getSource(): GatewayPaymentSourceInterface;
+    public function getSource(): GatewaySourceInterface;
 }

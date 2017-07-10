@@ -11,8 +11,8 @@ use Spiral\Transactions\Exceptions\Transaction\InvalidQuantityException;
 use Spiral\Transactions\Exceptions\TransactionException;
 use Spiral\Transactions\GatewayInterface;
 use Spiral\Transactions\GatewayTransactionInterface;
-use Spiral\Transactions\PaymentSources\CreditCardSource;
-use Spiral\Transactions\PaymentSources\TokenSource;
+use Spiral\Transactions\Sources\CreditCardSource;
+use Spiral\Transactions\Sources\TokenSource;
 
 class PaymentsProcessor
 {
@@ -121,10 +121,10 @@ class PaymentsProcessor
     {
         /** @var Transaction\Item $item */
         $item = $this->items->create();
-        $item->title = $title;
-        $item->amount = $amount;
-        $item->quantity = $quantity;
-        $item->type = $type;
+        $item->setType($type);
+        $item->setAmount($amount);
+        $item->setQuantity($quantity);
+        $item->setTitle($title);
 
         $this->transaction->items->add($item);
         $this->transaction->incPaidAmount($amount * $quantity);
@@ -190,42 +190,6 @@ class PaymentsProcessor
     }
 
     /**
-     * @param array $metadata
-     * @param array $attributes
-     *
-     * @return Transaction
-     * @throws GatewayException
-     */
-//    public function makeTransaction(PaymentSourceInterface $paymentSource, array $metadata = [], array $attributes = []): Transaction
-//    {
-//        try {
-//            $transaction = $this->gateway->createTransaction($this->transaction, $paymentSource, $metadata);
-//            foreach ($attributes as $name => $value) {
-//                $this->transaction->attributes->add(
-//                    $this->attributes->create(compact('name', 'value'))
-//                );
-//            }
-//
-//            $this->fillPurchaseTransaction($transaction);
-//            $this->transaction->save();
-//
-//            return $this->transaction;
-//        } catch (GatewayException $exception) {
-////            /** @var Transaction\Attribute $attribute */
-////            $attribute = $this->attributes->create([
-////                'name'  => Transaction\Attribute::GATEWAY_ERROR,
-////                'value' => $exception->getMessage()
-////            ]);
-////
-////            $this->transaction->attributes->add($attribute);
-////            $this->transaction->setFailedStatus();
-////            $this->transaction->save();
-//
-//            throw $exception;
-//        }
-//    }
-
-    /**
      * @param GatewayTransactionInterface $transaction
      */
     protected function fillTransaction(GatewayTransactionInterface $transaction)
@@ -257,6 +221,9 @@ class PaymentsProcessor
         $this->transaction->source = $source;
     }
 
+    /**
+     * @param array $attributes
+     */
     protected function fillAttributes(array $attributes)
     {
         foreach ($attributes as $name => $value) {

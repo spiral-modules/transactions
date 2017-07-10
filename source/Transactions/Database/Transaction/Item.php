@@ -5,6 +5,15 @@ namespace Spiral\Transactions\Database\Transaction;
 use Spiral\Models\Traits\TimestampsTrait;
 use Spiral\ORM\Record;
 
+/**
+ * Class Item
+ *
+ * @property string $type
+ * @property float  $amount
+ * @property int    $quantity
+ * @property string $title
+ * @package Spiral\Transactions\Database\Transaction
+ */
 class Item extends Record
 {
     use TimestampsTrait;
@@ -40,7 +49,7 @@ class Item extends Record
      */
     public function fullAmount(): float
     {
-        return $this->amount * $this->quantity;
+        return $this->getAmount() * $this->getQuantity();
     }
 
     /**
@@ -50,6 +59,70 @@ class Item extends Record
      */
     public function isCountable(): bool
     {
-        return $this->type === static::DEFAULT_TYPE;
+        return $this->getType() === static::DEFAULT_TYPE;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType(string $type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return float
+     */
+    public function getAmount(): float
+    {
+        return $this->amount;
+    }
+
+    /**
+     * @param float $amount
+     */
+    public function setAmount(float $amount)
+    {
+        $this->amount = $amount;
+    }
+
+    /**
+     * @return int
+     */
+    public function getQuantity(): int
+    {
+        return $this->quantity;
+    }
+
+    /**
+     * @param int $quantity
+     */
+    public function setQuantity(int $quantity)
+    {
+        $this->quantity = $quantity;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle(string $title)
+    {
+        $this->title = $title;
     }
 }

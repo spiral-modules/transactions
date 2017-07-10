@@ -9,7 +9,7 @@
 namespace Spiral\Transactions;
 
 
-interface GatewayPaymentSourceInterface
+interface GatewaySourceInterface
 {
     /**
      * Internal gateway ID.

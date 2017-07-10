@@ -1,16 +1,16 @@
 <?php
 
-namespace Spiral\Transactions\Gateways\Stripe;
+namespace Spiral\Transactions\Gateways\Stripe\Entities;
 
-use Spiral\Transactions\GatewayPaymentSourceInterface;
+use Spiral\Transactions\GatewaySourceInterface;
 
-class StripePaymentSource implements GatewayPaymentSourceInterface
+class Source implements GatewaySourceInterface
 {
     /** @var array */
     protected $data;
 
     /**
-     * StripePaymentSource constructor.
+     * Source constructor.
      *
      * @param array $data
      */

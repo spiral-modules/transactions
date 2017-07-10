@@ -4,6 +4,13 @@ namespace Spiral\Transactions\Database\Transaction;
 
 use Spiral\ORM\Record;
 
+/**
+ * Class Attribute
+ *
+ * @property string $name
+ * @property string $value
+ * @package Spiral\Transactions\Database\Transaction
+ */
 class Attribute extends Record
 {
     const DATABASE = 'transactions';

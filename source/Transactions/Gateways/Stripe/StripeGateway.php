@@ -2,18 +2,15 @@
 
 namespace Spiral\Transactions\Gateways\Stripe;
 
-use Spiral\Transactions\Database\Transaction;
 use Spiral\Transactions\Exceptions\Gateway\EmptySourceException;
 use Spiral\Transactions\Exceptions\GatewayException;
 use Spiral\Transactions\GatewayTransactionInterface;
 use Spiral\Transactions\GatewayInterface;
-use Spiral\Transactions\PaymentSources\CreditCardSource;
-use Spiral\Transactions\PaymentSources\TokenSource;
+use Spiral\Transactions\Sources\CreditCardSource;
+use Spiral\Transactions\Sources\TokenSource;
 use Spiral\Transactions\TransactionsConfig;
-use Stripe\BalanceTransaction;
 use Stripe\Charge;
 use Stripe\Error;
-use Stripe\Stripe;
 
 class StripeGateway implements GatewayInterface
 {
@@ -23,20 +20,29 @@ class StripeGateway implements GatewayInterface
     const SETTINGS_EXCEPTION_MSG          = 'Stripe connection settings error, please contact webmaster.';
     const UNEXPECTED_STRIPE_EXCEPTION_MSG = 'Unexpected Stripe error occurred while processing%s, please contact webmaster.';
     const UNEXPECTED_EXCEPTION_MSG        = 'Unexpected error occurred while processing%s, please contact webmaster.';
+    const UPD_EXCEPTION_MSG               = 'Error occurred while trying to retrieve Stripe charge';
 
     /** @var TransactionsConfig */
     protected $config;
+
+    /** @var Fees */
+    protected $fees;
+
+    /** @var Refunds */
+    protected $refunds;
 
     /**
      * StripeGateway constructor.
      *
      * @param TransactionsConfig $config
+     * @param Fees               $fees
+     * @param Refunds            $refunds
      */
-    public function __construct(TransactionsConfig $config)
+    public function __construct(TransactionsConfig $config, Fees $fees, Refunds $refunds)
     {
         $this->config = $config;
-
-        Stripe::setApiKey($this->getOptions()['api_key']);
+        $this->fees = $fees;
+        $this->refunds = $refunds;
     }
 
     /**
@@ -98,17 +104,38 @@ class StripeGateway implements GatewayInterface
     }
 
     /**
-     * @param array $params
+     * Retrieve Stripe transaction.
      *
-     * @return StripeTransaction
+     * @param string $id
+     *
+     * @return GatewayTransactionInterface
      * @throws GatewayException
      */
-    protected function createTransaction(array $params): StripeTransaction
+    public function updateTransaction(string $id): GatewayTransactionInterface
+    {
+        try {
+            $charge = Charge::retrieve($id, $this->getOptions());
+
+            return new Entities\Transaction($charge, $this->fees, $this->refunds);
+        } catch (\Throwable $exception) {
+            throw new GatewayException(self::UPD_EXCEPTION_MSG, $exception->getCode(), $exception);
+        }
+    }
+
+    /**
+     * Create Stripe transaction. Catch several errors for clients to be more informative.
+     *
+     * @param array $params
+     *
+     * @return Entities\Transaction
+     * @throws GatewayException
+     */
+    protected function createTransaction(array $params): Entities\Transaction
     {
         try {
             $charge = Charge::create($params, $this->getOptions());
 
-            return new StripeTransaction($charge);
+            return new Entities\Transaction($charge, $this->fees, $this->refunds);
         } catch (Error\Api $exception) {
             $msg = self::CONNECTION_EXCEPTION_MSG;
         } catch (Error\ApiConnection $exception) {
@@ -127,7 +154,7 @@ class StripeGateway implements GatewayInterface
                 self::UNEXPECTED_STRIPE_EXCEPTION_MSG,
                 !empty($code) ? sprintf(' (code: %s)', $code) : ''
             );
-        } catch (\Exception $exception) {
+        } catch (\Throwable $exception) {
             $code = $exception->getCode();
             $msg = sprintf(
                 self::UNEXPECTED_EXCEPTION_MSG,
@@ -136,24 +163,6 @@ class StripeGateway implements GatewayInterface
         }
 
         throw new GatewayException($msg, $exception->getCode(), $exception);
-    }
-
-    /**
-     * @param Charge $charge
-     *
-     * @return float
-     */
-    protected function calculateFee(Charge $charge): float
-    {
-        $balance = BalanceTransaction::retrieve($charge->balance_transaction);
-        $fee = $balance->fee;
-
-        foreach ($charge->refunds as $refund) {
-            $balance = BalanceTransaction::retrieve($refund->balance_transaction);
-            $fee += $balance->fee;
-        }
-
-        return $fee;
     }
 
     /**

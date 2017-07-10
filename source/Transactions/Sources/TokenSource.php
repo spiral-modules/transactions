@@ -1,6 +1,6 @@
 <?php
 
-namespace Spiral\Transactions\PaymentSources;
+namespace Spiral\Transactions\Sources;
 
 final class TokenSource
 {

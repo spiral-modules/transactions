@@ -4,6 +4,7 @@ namespace Spiral\Transactions\Database;
 
 use Spiral\Models\Traits\TimestampsTrait;
 use Spiral\ORM\Record;
+use Spiral\ORM\Entities\Relations\HasManyRelation;
 use Spiral\Transactions\Database\Transaction\Source;
 use Spiral\Transactions\Database\Types\TransactionStatus;
 
@@ -12,16 +13,16 @@ use Spiral\Transactions\Database\Types\TransactionStatus;
  *
  * @package Spiral\Transactions\Database
  *
- * @property string                                         $currency
- * @property string                                         $gateway
- * @property string                                         $gateway_id
- * @property float                                          $paid_amount
- * @property float                                          $refunded_amount
- * @property float|null                                     $fee_amount
- * @property TransactionStatus                              $status
- * @property \Spiral\ORM\Entities\Relations\HasManyRelation $refunds
- * @property \Spiral\ORM\Entities\Relations\HasManyRelation $attributes
- * @property \Spiral\ORM\Entities\Relations\HasManyRelation $items
+ * @property string                             $currency
+ * @property string                             $gateway
+ * @property string                             $gateway_id
+ * @property float                              $paid_amount
+ * @property float                              $refunded_amount
+ * @property float|null                         $fee_amount
+ * @property TransactionStatus                  $status
+ * @property HasManyRelation|Transaction\Refund $refunds
+ * @property HasManyRelation                    $attributes
+ * @property HasManyRelation                    $items
  */
 class Transaction extends Record
 {
@@ -73,6 +74,22 @@ class Transaction extends Record
     public function setCompletedStatus()
     {
         $this->status->setCompleted();
+    }
+
+    /**
+     * Apply "refunded" value.
+     */
+    public function setRefundedStatus()
+    {
+        $this->status->setRefunded();
+    }
+
+    /**
+     * Apply "partially-refunded" value.
+     */
+    public function setPartiallyRefunded()
+    {
+        $this->status->setPartiallyRefunded();
     }
 
     /**
