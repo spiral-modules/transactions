@@ -6,7 +6,7 @@ use Spiral\Core\DirectoriesInterface;
 use Spiral\Modules\ModuleInterface;
 use Spiral\Modules\PublisherInterface;
 use Spiral\Modules\RegistratorInterface;
-use Spiral\Transactions\TransactionsConfig;
+use Spiral\Transactions\Configs\TransactionsConfig;
 
 /**
  * Class TransactionsModule
