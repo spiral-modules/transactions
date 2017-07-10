@@ -12,18 +12,12 @@ class Refund extends Record
     const DATABASE = 'transactions';
 
     const SCHEMA = [
-        'id'                => 'primary',
-        'gateway_refund_id' => 'string(255)',
-        'currency'          => 'string(8)',
-        'amount'            => 'float'
-    ];
-
-    const DEFAULTS = [
-        'currency' => 'usd'
+        'id'         => 'primary',
+        'gateway_id' => 'string(255)',
+        'amount'     => 'float'
     ];
 
     const INDEXES = [
-        [self::INDEX, 'currency'],
-        [self::UNIQUE, 'gateway_refund_id'],
+        [self::UNIQUE, 'gateway_id'],
     ];
 }

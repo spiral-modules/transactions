@@ -13,11 +13,10 @@ use Spiral\Transactions\TransactionsConfig;
 use Stripe\BalanceTransaction;
 use Stripe\Charge;
 use Stripe\Error;
+use Stripe\Stripe;
 
 class StripeGateway implements GatewayInterface
 {
-    const GATEWAY_NAME = 'stripe';
-
     const CONNECTION_EXCEPTION_MSG        = 'Network communication with Stripe failed, please retry.';
     const RATE_LIMIT_EXCEPTION_MSG        = 'Too many requests to Stripe, please retry later.';
     const REQUEST_EXCEPTION_MSG           = 'Invalid request, please contact webmaster.';
@@ -25,8 +24,8 @@ class StripeGateway implements GatewayInterface
     const UNEXPECTED_STRIPE_EXCEPTION_MSG = 'Unexpected Stripe error occurred while processing%s, please contact webmaster.';
     const UNEXPECTED_EXCEPTION_MSG        = 'Unexpected error occurred while processing%s, please contact webmaster.';
 
-    /** @var array */
-    protected $gatewayOptions = [];
+    /** @var TransactionsConfig */
+    protected $config;
 
     /**
      * StripeGateway constructor.
@@ -35,7 +34,9 @@ class StripeGateway implements GatewayInterface
      */
     public function __construct(TransactionsConfig $config)
     {
-        $this->gatewayOptions = $config->gatewayOptions(static::class);
+        $this->config = $config;
+
+        Stripe::setApiKey($this->getOptions()['api_key']);
     }
 
     /**
@@ -43,7 +44,15 @@ class StripeGateway implements GatewayInterface
      */
     public function getName(): string
     {
-        return self::GATEWAY_NAME;
+        return $this->config->gatewayName(static::class);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getOptions(): array
+    {
+        return $this->config->gatewayOptions(static::class);
     }
 
     /**
@@ -97,9 +106,9 @@ class StripeGateway implements GatewayInterface
     protected function createTransaction(array $params): StripeTransaction
     {
         try {
-            $charge = Charge::create($params, $this->gatewayOptions);
+            $charge = Charge::create($params, $this->getOptions());
 
-            return new StripeTransaction($charge, $this->calculateFee($charge));
+            return new StripeTransaction($charge);
         } catch (Error\Api $exception) {
             $msg = self::CONNECTION_EXCEPTION_MSG;
         } catch (Error\ApiConnection $exception) {
@@ -148,44 +157,6 @@ class StripeGateway implements GatewayInterface
     }
 
     /**
-     * Update transaction values.
-     *
-     * @param Transaction $transaction
-     * @param Charge      $stripeCharge
-     *
-     * @return Transaction
-     */
-    protected function updateTransaction(Transaction $transaction, Charge $stripeCharge)
-    {
-        //Refund amount
-        $transaction->amounts->refundedValue = $stripeCharge->amount_refunded / 100;
-
-        //Fee value, todo: make sure this is OK
-        $transaction->amounts->gatewayFee = self::feeFixed + self::feeRate * ($transaction->amounts->paidValue - $transaction->amounts->refundedValue);
-
-        //Updating transaction
-        $transaction->transactionID = $stripeCharge->id;
-        $transaction->card->type = $stripeCharge->source->brand;
-
-        if ($stripeCharge->refunds->data && is_array($stripeCharge->refunds->data)) {
-            $lastID = $this->updateRefunds($transaction, $stripeCharge->refunds->data);
-
-            if (count($stripeCharge->refunds->data) >= 10) {
-                $refunds = $stripeCharge->refunds->all([
-                    'limit'          => 100,
-                    'starting_after' => $lastID
-                ]);
-
-                if ($refunds->data && is_array($refunds->data)) {
-                    $this->updateRefunds($transaction, $refunds->data);
-                }
-            }
-        }
-
-        return $transaction;
-    }
-
-    /**
      * @param float  $amount
      * @param string $currency
      *
@@ -208,7 +179,7 @@ class StripeGateway implements GatewayInterface
     protected function paymentTokenMetadata(TokenSource $source): array
     {
         if (!empty($source->getCustomerID())) {
-            if (empty($source)) {
+            if (empty($source->getSourceID())) {
                 throw new EmptySourceException();
             }
 

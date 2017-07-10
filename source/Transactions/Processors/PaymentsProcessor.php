@@ -1,6 +1,6 @@
 <?php
 
-namespace Spiral\Transactions;
+namespace Spiral\Transactions\Processors;
 
 use Spiral\Transactions\Database\Sources;
 use Spiral\Transactions\Database\Transaction;
@@ -9,10 +9,12 @@ use Spiral\Transactions\Exceptions\Transaction\EmptyAmountException;
 use Spiral\Transactions\Exceptions\Transaction\InvalidAmountException;
 use Spiral\Transactions\Exceptions\Transaction\InvalidQuantityException;
 use Spiral\Transactions\Exceptions\TransactionException;
+use Spiral\Transactions\GatewayInterface;
+use Spiral\Transactions\GatewayTransactionInterface;
 use Spiral\Transactions\PaymentSources\CreditCardSource;
 use Spiral\Transactions\PaymentSources\TokenSource;
 
-class TransactionsProcessor
+class PaymentsProcessor
 {
     /** @var Sources\ItemSource */
     protected $items;
@@ -179,17 +181,9 @@ class TransactionsProcessor
      */
     protected function pay(GatewayTransactionInterface $transaction, array $attributes)
     {
-        foreach ($attributes as $name => $value) {
-            $this->transaction->attributes->add(
-                $this->attributes->create(compact('name', 'value'))
-            );
-        }
-
-        /** @var Transaction\Source $source */
-        $source = $this->sources->create();
-        $source->
-
-        $this->fillPurchaseTransaction($transaction);
+        $this->fillTransaction($transaction);
+        $this->fillAttributes($attributes);
+        $this->fillSource($transaction);
         $this->transaction->save();
 
         return $this->transaction;
@@ -234,7 +228,7 @@ class TransactionsProcessor
     /**
      * @param GatewayTransactionInterface $transaction
      */
-    protected function fillPurchaseTransaction(GatewayTransactionInterface $transaction)
+    protected function fillTransaction(GatewayTransactionInterface $transaction)
     {
         $this->transaction->setCompletedStatus();
         $this->transaction->setGateway($this->gateway->getName());
@@ -242,5 +236,33 @@ class TransactionsProcessor
         $this->transaction->setCurrency($transaction->getCurrency());
         $this->transaction->setPaidAmount($transaction->getPaidAmount());
         $this->transaction->setFeeAmount($transaction->getFeeAmount());
+    }
+
+    /**
+     * @param GatewayTransactionInterface $transaction
+     */
+    protected function fillSource(GatewayTransactionInterface $transaction)
+    {
+        /** @var Transaction\Source $source */
+        $source = $this->sources->create();
+        $transactionSource = $transaction->getSource();
+
+        $source->setGatewayID($transactionSource->getSourceID());
+        $source->setCardType($transactionSource->getType());
+        $source->setCardHolder($transactionSource->getCardHolder());
+        $source->setExpMonth($transactionSource->getExpMonth());
+        $source->setExpYear($transactionSource->getExpYear());
+        $source->setNumberEnding($transactionSource->getNumberEnding());
+
+        $this->transaction->source = $source;
+    }
+
+    protected function fillAttributes(array $attributes)
+    {
+        foreach ($attributes as $name => $value) {
+            $this->transaction->attributes->add(
+                $this->attributes->create(compact('name', 'value'))
+            );
+        }
     }
 }

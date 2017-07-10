@@ -2,6 +2,7 @@
 
 namespace Spiral\Transactions\Gateways\Stripe;
 
+use Spiral\Transactions\GatewayPaymentSourceInterface;
 use Spiral\Transactions\GatewayTransactionInterface;
 use Stripe\Charge;
 
@@ -14,13 +15,14 @@ class StripeTransaction implements GatewayTransactionInterface
     protected $fee;
 
     /**
-     * @param \Stripe\Charge $charge
-     * @param float          $fee
+     * @param Charge $charge
      */
-    public function __construct(Charge $charge, float $fee)
+    public function __construct(Charge $charge)
     {
         $this->charge = $charge;
-        $this->fee = $fee;
+
+        $fees = new StripeFees($charge);
+        $this->fee = $fees->getFee();
     }
 
     /**
@@ -63,8 +65,11 @@ class StripeTransaction implements GatewayTransactionInterface
         return $this->charge->currency;
     }
 
-    public function getSource(): array
+    /**
+     * {@inheritdoc}
+     */
+    public function getSource(): GatewayPaymentSourceInterface
     {
-
+        return new StripePaymentSource($this->charge->source->jsonSerialize());
     }
 }

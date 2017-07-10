@@ -12,18 +12,26 @@ class TransactionsConfig extends InjectableConfig
     protected $config = [
         'gateways' => [
             StripeGateway::class => [
-                //required
-                'api_key'         => '',
-                //optional
-                'idempotency_key' => '',
-                'stripe_account'  => '',
-                'stripe_version'  => '',
+                'name'    => 'stripe',
+                'options' => [
+                    //required
+                    'api_key'         => '',
+                    //optional
+                    'idempotency_key' => '',
+                    'stripe_account'  => '',
+                    'stripe_version'  => '',
+                ]
             ]
         ]
     ];
 
     public function gatewayOptions(string $gateway): array
     {
-        return $this->config['gateways'][$gateway];
+        return $this->config['gateways'][$gateway]['options'];
+    }
+
+    public function gatewayName(string $gateway): string
+    {
+        return $this->config['gateways'][$gateway]['name'];
     }
 }

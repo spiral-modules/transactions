@@ -40,9 +40,9 @@ interface GatewayTransactionInterface
     public function getCurrency(): string;
 
     /**
-     * Transaction source.
+     * Transaction payment source.
      *
-     * @return array
+     * @return GatewayPaymentSourceInterface
      */
-    public function getSource(): array;
+    public function getSource(): GatewayPaymentSourceInterface;
 }
