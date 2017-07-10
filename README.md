@@ -3,8 +3,8 @@ Stripe transactions integration and Vault controls
 
 
 ### Pay
-```
-his->container->bind(GatewayInterface::class, StripeGateway::class);
+```php
+$this->container->bind(GatewayInterface::class, StripeGateway::class);
 /** @var Processors\PaymentsProcessor $processor */
 $processor = $this->container->get(Processors\PaymentsProcessor::class);
 
@@ -22,7 +22,7 @@ $processor->payWithCreditCard(
 ```
 
 ### Update data (refunds, fees, status)
-```
+```php
 /** @var \Spiral\Transactions\Processors\UpdateProcessor $processor */
 $processor = $this->container->make(Processors\UpdateProcessor::class);
 $processor->update($transaction);
