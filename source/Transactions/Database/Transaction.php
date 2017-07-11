@@ -158,9 +158,9 @@ class Transaction extends Record
     }
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getRefundedAmount(): float
+    public function getRefundedAmount(): ?float
     {
         return $this->refunded_amount;
     }
