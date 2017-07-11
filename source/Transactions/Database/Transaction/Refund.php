@@ -22,6 +22,7 @@ class Refund extends Record
     const SCHEMA = [
         'id'         => 'primary',
         'gateway_id' => 'string(255)',
+        'datetime'   => 'datetime',
         'amount'     => 'float'
     ];
 
@@ -59,5 +60,15 @@ class Refund extends Record
     public function setAmount(float $amount)
     {
         $this->amount = $amount;
+    }
+
+    public function getDatetime()
+    {
+        return $this->datetime;
+    }
+
+    public function setDatetime(string $datetime)
+    {
+        $this->datetime = $datetime;
     }
 }

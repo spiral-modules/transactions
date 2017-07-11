@@ -204,4 +204,28 @@ class Transaction extends Record
     {
         $this->currency = $currency;
     }
+
+    /**
+     * @return bool
+     */
+    public function isRefundable(): bool
+    {
+        return $this->isFullyRefundable() || $this->isPartiallyRefundable();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFullyRefundable(): bool
+    {
+        return $this->status->isCompleted();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPartiallyRefundable(): bool
+    {
+        return $this->status->isPartiallyRefunded();
+    }
 }

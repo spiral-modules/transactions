@@ -46,4 +46,28 @@ class TransactionStatus extends EnumColumn
     {
         $this->setValue(self::FAILED);
     }
+
+    /**
+     * @return bool
+     */
+    public function isCompleted(): bool
+    {
+        return $this->packValue() === self::COMPLETED;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPartiallyRefunded(): bool
+    {
+        return $this->packValue() === self::PARTIALLY_REFUNDED;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRefunded(): bool
+    {
+        return $this->packValue() === self::REFUNDED;
+    }
 }
