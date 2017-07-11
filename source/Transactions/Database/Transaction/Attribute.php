@@ -29,4 +29,14 @@ class Attribute extends Record
 
     const IP_ADDRESS    = 'ipAddress';
     const GATEWAY_ERROR = 'gatewayError';
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
 }
