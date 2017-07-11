@@ -230,4 +230,16 @@ class StripeGateway implements GatewayInterface
             ]
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function transactionGatewayURI(string $id): string
+    {
+        return sprintf(
+            'https://dashboard.stripe.com/%s/payments/%s',
+            $this->config->gatewayOption(self::class, 'environment'),
+            $id
+        );
+    }
 }

@@ -19,6 +19,7 @@ use Spiral\Transactions\Database\Types\TransactionStatus;
  * @property float                              $paid_amount
  * @property float                              $refunded_amount
  * @property float|null                         $fee_amount
+ * @property Source                             $source
  * @property TransactionStatus                  $status
  * @property HasManyRelation|Transaction\Refund $refunds
  * @property HasManyRelation                    $attributes

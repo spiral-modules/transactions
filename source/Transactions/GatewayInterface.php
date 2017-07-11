@@ -42,4 +42,11 @@ interface GatewayInterface
      * @return GatewayTransactionInterface
      */
     public function updateTransaction(string $id): GatewayTransactionInterface;
+
+    /**
+     * @param string $id
+     *
+     * @return string
+     */
+    public function transactionGatewayURI(string $id): string;
 }

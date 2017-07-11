@@ -11,8 +11,9 @@ use Spiral\Transactions\Gateways\Stripe\StripeGateway;
 return [
     'gateways' => [
         StripeGateway::class => [
-            'name'    => 'stripe',
-            'options' => [
+            'name'        => 'stripe',
+            'environment' => env('STRIPE_API_ENVIRONMENT'),
+            'options'     => [
                 //required
                 'api_key'         => env('STRIPE_API_KEY'),
                 //optional
