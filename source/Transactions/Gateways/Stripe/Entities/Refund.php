@@ -34,4 +34,12 @@ class Refund implements GatewayRefundInterface
     {
         return $this->refund->amount;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDatetime(): string
+    {
+        return $this->refund->created;
+    }
 }

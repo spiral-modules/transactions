@@ -17,4 +17,11 @@ interface GatewayRefundInterface
      * @return float
      */
     public function getAmount(): float;
+
+    /**
+     * Refund datetime.
+     *
+     * @return string
+     */
+    public function getDatetime(): string;
 }

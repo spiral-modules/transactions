@@ -80,6 +80,7 @@ class UpdateProcessor
             $refund = $this->refunds->create();
             $refund->setGatewayID($retrieved->getGatewayID());
             $refund->setAmount($retrieved->getAmount());
+            $refund->setDatetime($retrieved->getDatetime());
 
             $transaction->refunds->add($refund);
         }
