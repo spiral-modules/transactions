@@ -2,8 +2,8 @@
 
 namespace Spiral\Transactions\Gateways\Stripe;
 
-use Spiral\Transactions\Exceptions\Gateway\EmptySourceException;
-use Spiral\Transactions\Exceptions\GatewayException;
+use Spiral\Transactions\Exceptions\Gateway\ClientGatewayException;
+use Spiral\Transactions\Exceptions\Gateway\InternalGatewayException;
 use Spiral\Transactions\GatewayTransactionInterface;
 use Spiral\Transactions\GatewayInterface;
 use Spiral\Transactions\Sources\CreditCardSource;
@@ -74,7 +74,6 @@ class StripeGateway implements GatewayInterface
      * @param array       $params
      *
      * @return GatewayTransactionInterface
-     * @throws GatewayException
      */
     public function payWithToken(
         float $amount,
@@ -95,7 +94,6 @@ class StripeGateway implements GatewayInterface
      * @param array            $params
      *
      * @return GatewayTransactionInterface
-     * @throws GatewayException
      */
     public function payWithCreditCard(
         float $amount,
@@ -115,7 +113,7 @@ class StripeGateway implements GatewayInterface
      * @param string $id
      *
      * @return GatewayTransactionInterface
-     * @throws GatewayException
+     * @throws InternalGatewayException
      */
     public function updateTransaction(string $id): GatewayTransactionInterface
     {
@@ -126,7 +124,7 @@ class StripeGateway implements GatewayInterface
 
             return new Entities\Transaction($charge, $fee, $refunds);
         } catch (\Throwable $exception) {
-            throw new GatewayException(self::UPD_EXCEPTION_MSG, $exception->getCode(), $exception);
+            throw new InternalGatewayException(self::UPD_EXCEPTION_MSG, $exception->getCode(), $exception);
         }
     }
 
@@ -136,7 +134,7 @@ class StripeGateway implements GatewayInterface
      * @param array $params
      *
      * @return Entities\Transaction
-     * @throws GatewayException
+     * @throws InternalGatewayException|ClientGatewayException
      */
     protected function createTransaction(array $params): Entities\Transaction
     {
@@ -146,32 +144,32 @@ class StripeGateway implements GatewayInterface
 
             return new Entities\Transaction($charge, $fee);
         } catch (Error\Api $exception) {
-            $msg = self::CONNECTION_EXCEPTION_MSG;
+            throw new ClientGatewayException(self::CONNECTION_EXCEPTION_MSG, $exception->getCode(), $exception);
         } catch (Error\ApiConnection $exception) {
-            $msg = self::CONNECTION_EXCEPTION_MSG;
+            throw new ClientGatewayException(self::CONNECTION_EXCEPTION_MSG, $exception->getCode(), $exception);
         } catch (Error\Authentication $exception) {
-            $msg = self::SETTINGS_EXCEPTION_MSG;
+            throw new InternalGatewayException(self::SETTINGS_EXCEPTION_MSG, $exception->getCode(), $exception);
         } catch (Error\Card $exception) {
-            $msg = $exception->getMessage();
+            throw new ClientGatewayException($exception->getMessage(), $exception->getCode(), $exception);
         } catch (Error\RateLimit $exception) {
-            $msg = self::RATE_LIMIT_EXCEPTION_MSG;
+            throw new ClientGatewayException(self::RATE_LIMIT_EXCEPTION_MSG, $exception->getCode(), $exception);
         } catch (Error\InvalidRequest $exception) {
-            $msg = self::REQUEST_EXCEPTION_MSG;
+            throw new InternalGatewayException(self::REQUEST_EXCEPTION_MSG, $exception->getCode(), $exception);
         } catch (Error\Base $exception) {
             $code = $exception->getCode();
             $msg = sprintf(
                 self::UNEXPECTED_STRIPE_EXCEPTION_MSG,
                 !empty($code) ? sprintf(' (code: %s)', $code) : ''
             );
+            throw new InternalGatewayException($msg, $exception->getCode(), $exception);
         } catch (\Throwable $exception) {
             $code = $exception->getCode();
             $msg = sprintf(
                 self::UNEXPECTED_EXCEPTION_MSG,
                 !empty($code) ? sprintf(' (code: %s)', $code) : ''
             );
+            throw new InternalGatewayException($msg, $exception->getCode(), $exception);
         }
-
-        throw new GatewayException($msg, $exception->getCode(), $exception);
     }
 
     /**
@@ -192,13 +190,13 @@ class StripeGateway implements GatewayInterface
      * @param TokenSource $source
      *
      * @return array
-     * @throws EmptySourceException
+     * @throws InternalGatewayException
      */
     protected function paymentTokenMetadata(TokenSource $source): array
     {
         if (!empty($source->getCustomerID())) {
             if (empty($source->getSourceID())) {
-                throw new EmptySourceException();
+                throw new InternalGatewayException('Unable to process transaction, no payment method specified.');
             }
 
             return [

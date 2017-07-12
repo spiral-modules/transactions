@@ -2,9 +2,9 @@
 
 namespace Spiral\Transactions\Exceptions\Transaction;
 
-use Spiral\Transactions\Exceptions\TransactionException;
+use Spiral\Transactions\Exceptions\InternalException;
 
-class InvalidAmountException extends TransactionException
+class InvalidAmountException extends InternalException
 {
     public function __construct($amount = "", $code = 0, \Throwable $previous = null)
     {

@@ -2,9 +2,9 @@
 
 namespace Spiral\Transactions\Exceptions\Transaction;
 
-use Spiral\Transactions\Exceptions\TransactionException;
+use Spiral\Transactions\Exceptions\InternalException;
 
-class EmptyAmountException extends TransactionException
+class EmptyAmountException extends InternalException
 {
     public function __construct($message = "", $code = 0, \Throwable $previous = null)
     {

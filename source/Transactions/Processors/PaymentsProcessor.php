@@ -4,11 +4,10 @@ namespace Spiral\Transactions\Processors;
 
 use Spiral\Transactions\Database\Sources;
 use Spiral\Transactions\Database\Transaction;
-use Spiral\Transactions\Exceptions\GatewayException;
 use Spiral\Transactions\Exceptions\Transaction\EmptyAmountException;
 use Spiral\Transactions\Exceptions\Transaction\InvalidAmountException;
 use Spiral\Transactions\Exceptions\Transaction\InvalidQuantityException;
-use Spiral\Transactions\Exceptions\TransactionException;
+use Spiral\Transactions\Exceptions\AbstractTransactionException;
 use Spiral\Transactions\GatewayInterface;
 use Spiral\Transactions\GatewayTransactionInterface;
 use Spiral\Transactions\Sources\CreditCardSource;
@@ -115,7 +114,7 @@ class PaymentsProcessor
      * @param string $type
      *
      * @return Transaction\Item
-     * @throws TransactionException
+     * @throws AbstractTransactionException
      */
     protected function add(string $title, float $amount, int $quantity, string $type): Transaction\Item
     {
@@ -133,14 +132,12 @@ class PaymentsProcessor
     }
 
     /**
-     * @param string      $currency
      * @param TokenSource $source
+     * @param string      $currency
      * @param array       $params
      * @param array       $attributes
      *
      * @return Transaction
-     * @throws GatewayException
-     * @throws TransactionException
      */
     public function payWithToken(
         TokenSource $source,
@@ -160,7 +157,7 @@ class PaymentsProcessor
      * @param array            $attributes
      *
      * @return Transaction
-     * @throws TransactionException
+     * @throws AbstractTransactionException
      */
     public function payWithCreditCard(
         CreditCardSource $source,

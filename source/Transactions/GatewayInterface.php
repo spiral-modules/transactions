@@ -21,7 +21,7 @@ interface GatewayInterface
      * @param array       $params
      *
      * @return GatewayTransactionInterface
-     * @throws Exceptions\GatewayException
+     * @throws Exceptions\ClientException|Exceptions\InternalException
      */
     public function payWithToken(float $amount, string $currency, TokenSource $source, array $params = []): GatewayTransactionInterface;
 
@@ -32,7 +32,7 @@ interface GatewayInterface
      * @param array            $params
      *
      * @return GatewayTransactionInterface
-     * @throws Exceptions\GatewayException
+     * @throws Exceptions\ClientException|Exceptions\InternalException
      */
     public function payWithCreditCard(float $amount, string $currency, CreditCardSource $source, array $params = []): GatewayTransactionInterface;
 
@@ -40,6 +40,7 @@ interface GatewayInterface
      * @param string $id
      *
      * @return GatewayTransactionInterface
+     * @throws Exceptions\InternalException
      */
     public function updateTransaction(string $id): GatewayTransactionInterface;
 
