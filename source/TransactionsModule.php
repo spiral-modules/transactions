@@ -36,6 +36,11 @@ class TransactionsModule implements ModuleInterface
             "/*{{namespaces.transactions}}*/",
             "],",
         ]);
+
+        //Register controller in vault config
+        $registrator->configure('modules/vault', 'controllers', 'spiral/transactions', [
+            "'transactions' => \\Spiral\\Transactions\\Controllers\\TransactionsController::class,",
+        ]);
     }
 
     /**
