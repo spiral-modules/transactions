@@ -85,8 +85,10 @@
         <div class="col s12 m6">
             <vault:block title="[[Paid Items:]]">
                 <spiral:grid source="<?= $transaction->items ?>" as="item" color="" class="table responsive-table">
-                    <grid:cell label="[[Title:]]" title="<?= $item->getTitle() ?>">
-                        <?= \Spiral\Support\Strings::shorter($item->getTitle(), 100) ?>
+                    <grid:cell label="[[Title:]]">
+                        <span title="<?= $item->getTitle() ?>">
+                            <?= \Spiral\Support\Strings::shorter($item->getTitle(), 100) ?>
+                        </span>
                     </grid:cell>
                     <grid:cell label="[[Type:]]"><?= $item->getType() ?></grid:cell>
                     <grid:cell label="[[Quantity:]]"><?= $item->getQuantity() ?></grid:cell>
@@ -111,7 +113,7 @@
                     </spiral:grid>
                 <?php } else { ?>
                     <vault:card>
-                        <p>[[No refunds... Yet.]]</p>
+                        <p class="grey-text">[[No refunds... Yet.]]</p>
                     </vault:card>
                 <?php } ?>
             </vault:block>
@@ -120,7 +122,7 @@
                 <vault:allowed permission="vault.transactions.refund">
                     <vault:block title="[[Refund Payment:]]">
                         <spiral:form action="<?= vault()->uri('pages:transactions:fullRefund', ['id' => $transaction->primaryKey()]) ?>"
-                                     style="padding-bottom: 0;">
+                                     style="padding-bottom: 0; border-bottom: 1px solid #e0e0e0">
                             <?php if ($transaction->isPartiallyRefundable()) { ?>
                                 <div class="row">
                                     <div class="col s12 m12">
@@ -170,11 +172,6 @@
                                 </div>
                             <?php } ?>
                         </spiral:form>
-
-                        <div class="col m12">
-                            <hr/>
-                            <br/>
-                        </div>
 
                         <spiral:form action="<?= vault()->uri('pages:transactions:refund', ['id' => $transaction->primaryKey()]) ?>"
                                      style="padding-bottom: 5px;">

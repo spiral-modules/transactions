@@ -58,7 +58,6 @@
                            class="btn waves-effect teal"> [[View]]
                 </vault:uri>
             </vault:allowed>
-
         </grid:cell>
     </vault:listing>
 </define:content>
