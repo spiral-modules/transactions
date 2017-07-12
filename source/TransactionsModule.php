@@ -28,6 +28,14 @@ class TransactionsModule implements ModuleInterface
         $registrator->configure('databases', 'aliases', 'spiral/transactions', [
             "'transactions' => 'default',",
         ]);
+
+        //Register view namespace
+        $registrator->configure('views', 'namespaces', 'spiral/transactions', [
+            "'transactions' => [",
+            "directory('libraries') . 'spiral/transactions/source/views/',",
+            "/*{{namespaces.transactions}}*/",
+            "],",
+        ]);
     }
 
     /**
