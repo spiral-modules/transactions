@@ -145,7 +145,7 @@ class PaymentsProcessor
         array $params = [],
         array $attributes = []
     ): Transaction {
-        $transaction = $this->gateway->payWithToken($this->transaction->getPaidAmount(), $currency, $source, $params);
+        $transaction = $this->gateway->payWithToken($this->billableAmount(), $currency, $source, $params);
 
         return $this->pay($transaction, $attributes);
     }
@@ -165,9 +165,17 @@ class PaymentsProcessor
         array $params = [],
         array $attributes = []
     ): Transaction {
-        $transaction = $this->gateway->payWithCreditCard($this->transaction->getPaidAmount(), $currency, $source, $params);
+        $transaction = $this->gateway->payWithCreditCard($this->billableAmount(), $currency, $source, $params);
 
         return $this->pay($transaction, $attributes);
+    }
+
+    /**
+     * @return float
+     */
+    public function billableAmount(): float
+    {
+        return $this->transaction->getPaidAmount();
     }
 
     /**
