@@ -35,7 +35,11 @@ class Metadata
      */
     protected function merge(array $params, array $metadata): array
     {
-        $params['metadata'] += $metadata;
+        if (empty($params['metadata'])) {
+            $params['metadata'] = $metadata;
+        } else {
+            $params['metadata'] += $metadata;
+        }
 
         return $params;
     }
