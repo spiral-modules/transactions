@@ -42,7 +42,7 @@ final class CreditCardSource
      *
      * @return string|null
      */
-    public function getCardHolder(): ?string
+    public function getCardHolder()
     {
         return $this->cardHolder;
     }
@@ -82,7 +82,7 @@ final class CreditCardSource
      *
      * @return int|null
      */
-    public function getSecurityCode(): ?int
+    public function getSecurityCode()
     {
         return $this->securityCode;
     }

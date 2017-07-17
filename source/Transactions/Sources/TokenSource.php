@@ -37,7 +37,7 @@ final class TokenSource
      *
      * @return string|null
      */
-    public function getCustomerID(): ?string
+    public function getCustomerID()
     {
         return $this->customerID;
     }

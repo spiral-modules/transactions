@@ -10,6 +10,7 @@ use Spiral\Transactions\Exceptions\Transaction\InvalidQuantityException;
 use Spiral\Transactions\Exceptions\AbstractTransactionException;
 use Spiral\Transactions\GatewayInterface;
 use Spiral\Transactions\GatewayTransactionInterface;
+use Spiral\Transactions\Processors\PaymentProcessor\Metadata;
 use Spiral\Transactions\Sources\CreditCardSource;
 use Spiral\Transactions\Sources\TokenSource;
 
@@ -29,6 +30,9 @@ class PaymentsProcessor
     /** @var GatewayInterface */
     protected $gateway;
 
+    /** @var Metadata */
+    private $metadata;
+
     /**
      * TransactionsProcessor constructor.
      *
@@ -37,13 +41,15 @@ class PaymentsProcessor
      * @param Sources\AttributeSource   $attributeSource
      * @param Sources\SourceSource      $sourceSource
      * @param GatewayInterface          $gateway
+     * @param Metadata                  $metadata
      */
     public function __construct(
         Sources\TransactionSource $source,
         Sources\ItemSource $itemSource,
         Sources\AttributeSource $attributeSource,
         Sources\SourceSource $sourceSource,
-        GatewayInterface $gateway
+        GatewayInterface $gateway,
+        Metadata $metadata
     ) {
         $this->transaction = $source->create();
 
@@ -51,6 +57,8 @@ class PaymentsProcessor
         $this->attributes = $attributeSource;
         $this->sources = $sourceSource;
         $this->gateway = $gateway;
+
+        $this->metadata = $metadata;
     }
 
     /**
@@ -145,7 +153,12 @@ class PaymentsProcessor
         array $params = [],
         array $attributes = []
     ): Transaction {
-        $transaction = $this->gateway->payWithToken($this->billableAmount(), $currency, $source, $params);
+        $transaction = $this->gateway->payWithToken(
+            $this->billableAmount(),
+            $currency,
+            $source,
+            $this->metadata->mergeMetadata($params, $this->transaction)
+        );
 
         return $this->pay($transaction, $attributes);
     }
@@ -165,7 +178,12 @@ class PaymentsProcessor
         array $params = [],
         array $attributes = []
     ): Transaction {
-        $transaction = $this->gateway->payWithCreditCard($this->billableAmount(), $currency, $source, $params);
+        $transaction = $this->gateway->payWithCreditCard(
+            $this->billableAmount(),
+            $currency,
+            $source,
+            $this->metadata->mergeMetadata($params, $this->transaction)
+        );
 
         return $this->pay($transaction, $attributes);
     }

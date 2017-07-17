@@ -23,7 +23,7 @@ use Spiral\Transactions\Database\Types\TransactionStatus;
  * @property TransactionStatus                  $status
  * @property HasManyRelation|Transaction\Refund $refunds
  * @property HasManyRelation                    $attributes
- * @property HasManyRelation                    $items
+ * @property HasManyRelation|Transaction\Item[] $items
  */
 class Transaction extends Record
 {
@@ -160,7 +160,7 @@ class Transaction extends Record
     /**
      * @return float|null
      */
-    public function getRefundedAmount(): ?float
+    public function getRefundedAmount()
     {
         return $this->refunded_amount;
     }
