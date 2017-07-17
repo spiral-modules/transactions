@@ -89,7 +89,7 @@ class Metadata
             '%s (%s x %s)',
             $item->title,
             $item->quantity,
-            number_format($item->getAmount(), 2)
+            $item->getAmount()
         );
     }
 }
