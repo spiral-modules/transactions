@@ -38,6 +38,10 @@
         </listing:form>
     </vault:card>
 
+    <?php
+    /** @var \Spiral\Transactions\VaultServices\Currencies $currencies */
+    $currencies = spiral(\Spiral\Transactions\VaultServices\Currencies::class);
+    ?>
     <vault:listing listing="<?= $listing ?>" as="entity" color="" class="striped">
         <grid:cell sorter="id" label="[[ID:]]" value="<?= $entity->primaryKey() ?>"/>
         <grid:cell sorter="created" label="[[Created:]]" value="<?= $entity->time_created ?>"/>
@@ -45,10 +49,10 @@
             <span title="<?= $entity->getGatewayID() ?>"><strong>*</strong></span>
         </grid:cell>
         <grid:cell sorter="currency" label="[[Currency:]]" value="<?= $entity->getCurrency() ?>"/>
-        <grid:cell sorter="paid_amount" label="[[Amount:]]" value="<?= number_format($entity->getPaidAmount() / 100, 2) ?>"/>
-        <grid:cell sorter="title" label="[[Card:]]"><?= $entity->source->getCardType() ?> / <?= $entity->source->getNumberEnding() ?></grid:cell>
-        <grid:cell sorter="title" label="[[Card Holder:]]"><?= $entity->source->getCardHolder() ?></grid:cell>
-        <grid:cell sorter="title" label="[[Status:]]">
+        <grid:cell sorter="amount" label="[[Amount:]]" value="<?= $currencies->formatValue($entity->getCurrency(), $entity->getPaidAmount()) ?>"/>
+        <grid:cell label="[[Card:]]"><?= $entity->source->getCardType() ?> / <?= $entity->source->getNumberEnding() ?></grid:cell>
+        <grid:cell label="[[Card Holder:]]"><?= $entity->source->getCardHolder() ?></grid:cell>
+        <grid:cell label="[[Status:]]">
             <i class="material-icons tiny"><?= $statuses->icon($entity->status) ?></i>
             <?= $statuses->label($entity->status) ?>
         </grid:cell>

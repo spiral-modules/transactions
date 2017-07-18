@@ -56,13 +56,13 @@
                     <dd><?= strtoupper($transaction->getCurrency()) ?></dd>
 
                     <dt>[[Paid amount:]]</dt>
-                    <dd><?= number_format($transaction->getPaidAmount(), 2) ?></dd>
+                    <dd><?= $currencies->formatValue($transaction->getCurrency(), $transaction->getPaidAmount()) ?></dd>
 
                     <dt>[[Refunded amount:]]</dt>
-                    <dd><?= number_format($transaction->getRefundedAmount(), 2) ?></dd>
+                    <dd><?= $currencies->formatValue($transaction->getCurrency(), $transaction->getRefundedAmount()) ?></dd>
 
                     <dt>[[Fee:]]</dt>
-                    <dd>$<?= number_format($transaction->getFeeAmount(), 2) ?></dd>
+                    <dd>$<?= $currencies->formatValue($transaction->getCurrency(), $transaction->getFeeAmount()) ?></dd>
                 </dl>
             </vault:block>
 
@@ -92,7 +92,7 @@
                     </grid:cell>
                     <grid:cell label="[[Type:]]"><?= $item->getType() ?></grid:cell>
                     <grid:cell label="[[Quantity:]]"><?= $item->getQuantity() ?></grid:cell>
-                    <grid:cell label="[[Price:]]"><?= number_format($item->getAmount(), 2) ?></grid:cell>
+                    <grid:cell label="[[Price:]]"><?= $currencies->formatValue($transaction->getCurrency(), $item->getAmount()) ?></grid:cell>
                 </spiral:grid>
             </vault:block>
 
@@ -109,7 +109,7 @@
                 <?php if ($transaction->refunds->count()) { ?>
                     <spiral:grid source="<?= $transaction->refunds ?>" as="refund" color="" class="table responsive-table">
                         <grid:cell label="[[Gateway ID:]]"><?= $refund->getGatewayID() ?></grid:cell>
-                        <grid:cell label="[[Amount:]]"><?= number_format($item->getAmount(), 2) ?></grid:cell>
+                        <grid:cell label="[[Amount:]]"><?= $currencies->formatValue($transaction->getCurrency(), $item->getAmount()) ?></grid:cell>
                     </spiral:grid>
                 <?php } else { ?>
                     <vault:card>
@@ -136,8 +136,8 @@
                                                 'Refund the remaining {amount}',
                                                 [
                                                     'amount' => $currencies->formatValue(
-                                                        $transaction->getPaidAmount() - $transaction->getRefundedAmount(),
-                                                        $transaction->getCurrency()
+                                                        $transaction->getCurrency(),
+                                                        $transaction->getPaidAmount() - $transaction->getRefundedAmount()
                                                     )
                                                 ]
                                             );
@@ -145,8 +145,8 @@
                                                 '{amount} has already been refunded.',
                                                 [
                                                     'amount' => $currencies->formatValue(
-                                                        $transaction->getRefundedAmount(),
-                                                        $transaction->getCurrency()
+                                                        $transaction->getCurrency(),
+                                                        $transaction->getRefundedAmount()
                                                     )
                                                 ]
                                             );
@@ -164,7 +164,7 @@
                                             <?= l(
                                                 'Refund the full amount ({amount})',
                                                 [
-                                                    'amount' => $currencies->formatValue($transaction->getPaidAmount(), $transaction->getCurrency())
+                                                    'amount' => $currencies->formatValue($transaction->getCurrency(), $transaction->getPaidAmount())
                                                 ]
                                             ) ?>
                                         </p>

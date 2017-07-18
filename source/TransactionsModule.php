@@ -6,6 +6,7 @@ use Spiral\Core\DirectoriesInterface;
 use Spiral\Modules\ModuleInterface;
 use Spiral\Modules\PublisherInterface;
 use Spiral\Modules\RegistratorInterface;
+use Spiral\Transactions\Configs\CurrencyConfig;
 use Spiral\Transactions\Configs\TransactionsConfig;
 
 /**
@@ -52,6 +53,11 @@ class TransactionsModule implements ModuleInterface
         $publisher->publish(
             __DIR__ . '/config/config.php',
             $directories->directory('config') . TransactionsConfig::CONFIG . '.php',
+            PublisherInterface::FOLLOW
+        );
+        $publisher->publish(
+            __DIR__ . '/config/currencies.php',
+            $directories->directory('config') . CurrencyConfig::CONFIG . '.php',
             PublisherInterface::FOLLOW
         );
     }
