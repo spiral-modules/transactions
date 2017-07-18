@@ -51,7 +51,7 @@
         <grid:cell sorter="currency" label="[[Currency:]]" value="<?= $entity->getCurrency() ?>"/>
         <grid:cell sorter="amount" label="[[Amount:]]" value="<?= $currencies->formatValue($entity->getCurrency(), $entity->getPaidAmount()) ?>"/>
         <grid:cell label="[[Card:]]"><?= $entity->source->getCardType() ?> / <?= $entity->source->getNumberEnding() ?></grid:cell>
-        <grid:cell label="[[Card Holder:]]"><?= $entity->source->getCardHolder() ?></grid:cell>
+        <grid:cell sorter="holder" label="[[Card Holder:]]"><?= $entity->source->getCardHolder() ?></grid:cell>
         <grid:cell label="[[Status:]]">
             <i class="material-icons tiny"><?= $statuses->icon($entity->status) ?></i>
             <?= $statuses->label($entity->status) ?>
