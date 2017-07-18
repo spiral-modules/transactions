@@ -39,6 +39,7 @@ class Listings
         $listing->addSorter('created', new BinarySorter('time_created'));
         $listing->addSorter('amount', new BinarySorter('paid_amount'));
         $listing->addSorter('currency', new BinarySorter('currency'));
+        $listing->addSorter('holder', new BinarySorter('card_holder'));
 
         $listing->addFilter(
             'status',
