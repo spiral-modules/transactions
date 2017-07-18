@@ -62,7 +62,7 @@
                     <dd><?= $currencies->formatValue($transaction->getCurrency(), $transaction->getRefundedAmount()) ?></dd>
 
                     <dt>[[Fee:]]</dt>
-                    <dd>$<?= $currencies->formatValue($transaction->getCurrency(), $transaction->getFeeAmount()) ?></dd>
+                    <dd><?= $currencies->formatValue($transaction->getCurrency(), $transaction->getFeeAmount()) ?></dd>
                 </dl>
             </vault:block>
 
