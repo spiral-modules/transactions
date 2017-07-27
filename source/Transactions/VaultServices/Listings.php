@@ -60,11 +60,16 @@ class Listings
         $listing->addFilter(
             'metadata',
             new SearchFilter([
-                'items.title'       => SearchFilter::LIKE_STRING,
-                'items.amount'      => SearchFilter::EQUALS_FLOAT,
-                'attributes.value'  => SearchFilter::LIKE_STRING,
-                'source.cardHolder' => SearchFilter::LIKE_STRING,
-            ], new Dependency('items'), new Dependency('attributes'), new Dependency('source'))
+                'items.title'        => SearchFilter::LIKE_STRING,
+                'items.amount'       => SearchFilter::EQUALS_FLOAT,
+                'attributes.value'   => SearchFilter::LIKE_STRING,
+                'source.card_holder' => SearchFilter::LIKE_STRING,
+            ], [
+                    new Dependency('items', ['alias' => 'items']),
+                    new Dependency('attributes', ['alias' => 'attributes']),
+                    new Dependency('source', ['alias' => 'source'])
+                ]
+            )
         );
 
         $defaultState = new StaticState('id', ['status' => TransactionStatus::COMPLETED], SorterInterface::DESC);
